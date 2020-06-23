@@ -1,0 +1,266 @@
+--****************总结******************
+--	note:ON/WHERE/HAVING
+--		1:ON通常是多个表进行连接时使用ON条件进行匹配；ON过滤后不是最终结果
+--		2:WHERE直接对数据进行过滤得出结果
+--		3:WHERE对被选择的列施加条件，而HAVING则对 GROUP BY 治具所产生的组施加条件 
+--select TE.Name from Teacher  TE
+--union
+--select CO.Name from Course CO
+--要求两个select的列数一样，且类型一样
+
+--select * 
+--into ChatRepo.dbo.CourseBackup
+--from Course;
+--将一个数据库中的表复制到另一个数据库中
+--IN在SqlServer中不能使用
+
+--select *
+--into CouresBackup
+--from Course
+--将一个表备份到另一个表中
+
+--insert into Teacher (Name)
+--select Name from  Course
+--将一个表中的列复制到另一个
+--已存在的表中的列中，要求类型
+--一致
+
+--drop table dbo.CourseBackup
+--删除表（也可以只删除表中的所有数据使用turncate table tablename）
+
+--create database MYDB
+--创建数据库
+--drop database MYDB
+--删除数据库
+
+--alter table CouresBackup
+--add Level int
+--给表中添加列
+--alter table CouresBackup
+--drop column Level
+--删除表中的列
+
+--alter table CouresBackup
+--alter column Time char(5)
+--修改表中数据的类型
+
+--****************视图******************
+--note：
+--	1:视图是基于 SQL 语句的结果集的可视化的表。
+--  2：视图总是显示最新数据；每当用户查询视图时，数据库引擎就是用视图的SQL语句重新构建数据
+--CREATE VIEW TeacherView AS 
+--SELECT Name as '姓名',Age as '年龄'
+--FROM Teacher
+--WHERE Age IS NOT NULL
+--WITH CHECK OPTION;
+--WITH CHECK OPTION:要求插入或者更新的列必须满足条件Age不能为空
+--视图的创建
+--insert into dbo.CourseView(Name,Time)
+--values('政治',787)
+--视图的插入
+--update dbo.CourseView 
+--set Time='44'
+--where Name='政治'
+--视图的更新
+--select * 
+--from dbo.CourseView
+--视图的查
+--delete 
+--from dbo.CourseView 
+--where Name='数学'
+--视图数据的删除
+--drop view dbo.CourseView
+--删除视图
+
+--select TE.Age AS '年龄',TE.Name AS '姓名'
+--FROM Teacher AS TE
+--WHERE TE.Age IS NULL
+--AS只用于查询期间
+
+--DELETE FROM Teacher 
+--WHERE Teacher.Age IS NULL
+--删除值为null的数据
+
+--CREATE TABLE Colleges
+--(
+--	C_ID INT ,
+--	Name_ID int,
+--	CC_ID int,
+--	DD_ID int,
+--	Sex VARCHAR(255),
+--	ddd VARCHAR(255),
+--	City VARCHAR(255)
+--)
+
+--****************约束总结知识点******************
+--alter table Colleges
+--主键和标识的区别：
+--	相同点：都为列和列集合提供了唯一性的保证
+--	不同点：标识可以为空但是不能超多1个（对类型无要求）
+--			主键不能为空（对类型无要求）
+--	  结论：主键可以做标识，但是标识不能做主键
+--***********************删除表********************
+--CREATE TABLE Test_AutoIncrease
+--(
+--	ID INT IDENTITY(1,2) PRIMARY KEY,
+--	Name VARCHAR(255) NOT NULL,
+--	Address VARCHAR(255),
+--	City VARCHAR(255)
+--)
+--创建自动增加字段
+--dbcc checkident('Test_AutoIncrease',reseed,1);
+--删除之后重新设置id（https://blog.csdn.net/tswc_byy/article/details/81747159）
+--可查询DBCC命令(官网：https://docs.microsoft.com/zh-cn/sql/t-sql/database-console-commands/dbcc-transact-sql?redirectedfrom=MSDN&view=sql-server-ver15）
+--drop table dbo.Colleges
+--删除表
+--****************IDENTITY（自增）******************
+--****************UNIQUE(标识)******************
+--add constraint sss unique (C_ID,Name_ID,Sex)  此三个为一组数据的标识
+--add constraint ddd unique (City)  设置City为一个表示
+--修改表约束
+--****************PRIMARY KEY(主键)******************
+--alter Column[CC_ID] int not null
+--修改表数据不能为空
+--add constraint primary_1 primary key(C_ID)
+--添加主键约束
+--****************FOREIGN KEY(外键)******************
+--create table KEY1
+--(
+--	K_ID int not null,
+--	K_NO int not null,
+--	P_ID int not null,
+--	Mood varchar(255),
+--	eng varchar(255),
+--	constraint key_pri primary key(K_ID),
+--	constraint key_for foreign key(P_ID) references Persion(P_ID)
+--)
+--创建表的时候进行外键的约束
+--alter table KEY1
+--drop constraint key_pri,key_for
+--删除外键约束
+--add constraint key_pri primary key(K_ID),constraint key_For foreign key(P_ID) references Persion(P_ID)
+--添加外键约束
+--****************DEFAULT(默认值)******************
+--create table table2
+--(
+--	K_ID int not null,
+--	K_NO int not null,
+--	P_ID int not null,
+--	Mood varchar(255) default '高兴',
+--	eng varchar(255)
+--)
+--创建表并赋予默认值
+--alter table table2
+--add constraint value_default default('hello') for eng
+--添加默认值约束
+--drop constraint value_default
+--删除默认值约束
+--****************Check(取值范围)******************
+--create table table3
+--(
+--	P_ID int not null,
+--	LastName varchar(255) not null,
+--	FirstName varchar(255),
+--	Address varchar(255),
+--	City varchar(255),
+--	constraint value_check check (P_ID>1 and City='中国')
+--)
+--创建表时添加约束条件
+--alter table table3
+--add constraint addvalue_check  check(Address='河南')
+--动态增加约束
+--drop constraint addvalue_check
+--动态删除约束
+
+--drop constraint peimary_1
+--删除表约束
+--****************Index(索引)**************
+--描述：索引就是表中数据的指针
+--命令格式：
+--		CREATE [UNIQE] INDEX Stu on table_name;  创建索引
+--		DROP INDEX table_name.index_name;
+--使用原则：
+--		创建单列索引还是聚集索引依据：取决于每次查询中，哪些列作为过滤条件的
+--避免使用索引的情况：
+--		小的数据表
+--		需要进行大批量的更新或者茶如操作的表
+--		列中包含大数或者Null值
+--		频繁操作得列不以创建索引
+--create index index_name
+--on table_name(column1,column2);
+--创建索引
+--create table Test_Index(
+--	I_ID int primary key indetity(1,1),	
+--	Age int not null,
+--	Sex varchar(250) not null,
+--	Name nvarchar(250) not null
+--)
+--drop table Test_Index
+--create index nameIndex
+--on Test_Index(Name)
+--创建索引
+--drop index Test_Index.nameIndex
+--删除索引
+--****************ALTER TABLE**************
+--note:
+--	1:添加，删除或者更改现有数据表中的列
+--	2：添加，删除向右表上的约束
+--CREATE TABLE TestAlterTable
+--(
+--	A_ID INT PRIMARY KEY NOT NULL
+--)
+--ALTER TABLE TestAlterTable ADD Sex NVARCHAR(50) NOT NULL;
+--增加新列
+--ALTER TABLE TestAlterTable DROP COLUMN Name;
+--删除列
+--ALTER TABLE TestAlterTable ALTER COLUMN Sex INT NOT NULL;
+--修改列类型
+--ALTER TABLE TestAlterTable ALTER COLUMN Sex INT;
+--修改约束
+--ALTER TABLE TestAlterTable
+--ADD CONSTRAINT MyUniqueConstraint UNIQUE (Name,Sex);
+--添加标识
+--ALTER TABLE table_name
+--ADD CONSTRAINT MyUniqueConstraint CHECK (CONDITION);
+--添加Check约束
+--Alter Table tablename
+--ADD CONSTRAINT MyPrinaryKey PRIMARY KEY (column1,column2);
+--添加主键约束
+--ALTER TABLE tablename
+--DEOP CONSTRAINT MyUniqueConstrant;
+--删除约束
+--TRUNCATE TABLE TestAlterTable
+--删除表中数据但是不删除表结构
+--SELECT DISTINCT Sex FROM TestAlterTable
+--ORDER BY Sex		
+--去重
+--****************HAVING**************
+--	1：HAVING使你指定条件过滤，从而控制查询结果中哪些组可以出现在最终结果的里面
+--	2：WHERE对被选择的列施加条件，而HAVING则对 GROUP BY 治具所产生的组施加条件
+--	3：HAVING子句必须紧跟在GROUP BY子句之后，并出现在ORDER BY之前
+--SELECT Age
+--FROM Teacher
+--WHERE Name IS NOT NULL
+--GROUP BY Age
+--HAVING Age>20
+--Age必须在聚合函数或者GROUP BY函数中
+--****************事务**************
+--note：
+--	1：事务是对数据库进行的一系列有序操作，这些操作具有原子性，一致性，隔离性，持久性
+--	2：事务控制：COMMIT（提交更改）,ROLLBACK（回滚更改）,
+--               SAVEPOINT（在事务内部创建一系列可以回滚的还原点）,SET TEANSACTION（命名事务）
+--****************通配符**************
+--note：
+--	1：%匹配一个或者多个字符
+--	2：_匹配一个字符
+--SELECT *
+--FROM Teacher
+--WHERE Name LIKE '%咖啡%'
+--注意此处通配符的使用前后都加是因为该字段的类型后面填充的空格
+--****************SQL函数**************
+--SELECT MAX(T.Age) AS  '最大年龄'
+--SELECT MIN(T.Age) AS  '最小年龄'
+--SELECT COUNT(*) AS '记录数'
+--SELECT AVG(Age) AS '平均年龄'
+--SELECT SUM(Age) AS '平均年龄'
+--FROM Teacher T
