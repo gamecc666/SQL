@@ -264,3 +264,142 @@
 --SELECT AVG(Age) AS '平均年龄'
 --SELECT SUM(Age) AS '平均年龄'
 --FROM Teacher T
+--***************************************存储过程****************************************
+--note:
+--	1:概念理解
+--	   是一组为了完成特定功能的SQL语句；类似一门程序设计语言，包含了数据类型，流程控制，输入输出和它自己的函数库；
+--	   它是由T-SQL语句组成的代码块，就想一个实现特定功能的方法一样取个名字，使用的时候调用一下就可以了
+--	2：优点
+--	   a:只在创造时进行编译，以后每次执行存储过程都不需要重新编译，固提高了数据库执行速度，效率要高
+--	   b:在对数据库进行复杂操作时，可将复杂操作用存储过程封装起来与数据库提供的事务处理结合一起使用
+--	   c:一个存储过程可代替大堆的SQL语句，固能降低网络通信量，提高通行速率
+--	   d:存储过程可重复使用，固减少开发量
+--	   e:安全性高，固对特定用户给定特定的使用权
+--	3：使用
+--	   AS:关键字分割存储过程的标题和正文
+--create procedure selectInfo
+--as
+--begin 
+--	select Sname,Aage
+--	from StorageProcess
+--	order by Sname
+--end
+--go
+--创建简单筛选的存储过程
+--alter procedure selectInfo
+--as
+--begin 
+--	select Sname,Aage,Sprice
+--	from StorageProcess
+--	order by Sprice
+--end
+--go
+--修改存储过程
+--execute selectInfo
+--执行简单筛选的存储过程
+--drop procedure selectInfo
+--删除存储过程
+-------------------简单存储过程-----------------------
+--alter procedure selectInfo
+--(
+-- --组一
+--	--@min_price as int,
+--	--@max_price as int,
+--	--@name as varchar(50)
+-- -- 组二
+--	@min_price as int =20,
+--	@max_price as int =60,
+--	@name as varchar(50)
+--	组三
+--	@min_price as int =20,
+--	@max_price as int =null,
+--	@name as varchar(50)
+--)
+--as 
+--begin
+--	select Sname,Aage,Sprice
+--	from StorageProcess
+--	where Sprice>=@min_price and Sprice<=@max_price and Sname like @name+'%'
+--	where Sprice>=@min_price and (Sprice<=@max_price  or Sprice is null) and Sname like @name+'%'
+--	order by Sprice
+--end
+--修改存储过程参数的使用
+--execute selectInfo 20,60;
+--execute selectInfo;
+--execute selectInfo @min_price=20,@max_price=60,@name='吃';  命名参数，文本参数测试
+--execute selectInfo @name='吃'; 可选参数测试
+--调用参数的存储过程的三种方式
+-------------------参数-----------------------
+--note：
+--	1：概念
+--		保存特定类型的单个值的对象
+--	2：用处
+--		a:作为循环计数器来计算循环执行的次数
+--		b:保持要通过控制流语句（如while）进行测试的值
+--		c:存储函数或存储过程返回的值
+--	3：声明（默认声明的变量值为null）
+--		a:使用declare语句；declare @model_year int;
+--		b:变量和类型之间可使用可选的AS关键字
+--		c:多个变量之间使用逗号分隔开
+--	4：赋值
+--		a:使用set语句；set @model_year=2020;
+-------------------变量-----------------------
+--note:
+--	1：语法
+--		parameter_name data_type OUTPUT
+--案例一
+--create procedure outParm(
+--	@price int,
+--	@sums int output
+--)as
+--begin
+--	select *
+--	from StorageProcess SP
+--	where SP.Sprice>@price
+	
+--	select @sums=@@ROWCOUNT;
+--end;
+--创建输出参数
+--declare @count int;
+--execute outParm 
+--	@price=20,
+--	@sums=@count output;
+--select @count as '满足数量';
+--执行存储程序
+--************************输出参数***********************
+
+-------------------流程控制语句-----------------------
+--note:
+--	1:begin end 用于定义语句块；语句块也称为批处理，由一组一起执行的sql语句组成
+--	2:
+-------------------begin  end-----------------------
+--与平时用法一样
+-------------------if else-----------------------
+--DECLARE @counter INT = 1;
+--WHILE @counter <= 5
+--BEGIN
+--    PRINT @counter;
+--    SET @counter = @counter + 1;
+--END
+-------------------while-----------------------
+--DECLARE @counter INT = 0;
+
+--WHILE @counter <= 5
+--BEGIN
+--    SET @counter = @counter + 1;
+--    IF @counter = 4
+--        BREAK;
+--    PRINT @counter;
+-------------------break-----------------------
+--DECLARE @counter INT = 0;
+
+--WHILE @counter < 5
+--BEGIN
+--    SET @counter = @counter + 1;
+--    IF @counter = 3
+--        CONTINUE; 
+--    PRINT @counter;
+-------------------continue-----------------------
+
+
+--***************************************触发器****************************************
