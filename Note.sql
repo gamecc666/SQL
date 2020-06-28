@@ -403,3 +403,71 @@
 
 
 --***************************************触发器****************************************
+--创建数据更新记录表
+--create table Student_audits(
+--	change_id int identity primary key,
+--	S_ID int not null,
+--	Sname varchar(50),
+--	Sage datetime ,
+--	Ssex varchar(50),
+--	update_at datetime not null,
+--	operation char(3) not null,
+--	check(operation='INS' or operation ='DEL')
+--)
+--创建触发器
+--create trigger Student_audits_tri
+--on Student
+--after insert, delete
+--as
+--begin 
+--	set nocount on;
+--	insert into Student_audits(
+--		S_ID,
+--		Sname,
+--		Sage,
+--		Ssex,
+--		update_at,
+--		operation
+--	)
+--	select
+--		i.S_ID,
+--		i.Sname,
+--		i.Sage,
+--		i.Ssex,
+--		GETDATE(),
+--		'INS'
+--	from
+--		inserted i
+--	union all
+--	select
+--		d.S_ID,
+--		d.Sname,
+--		d.Sage,
+--		d.Ssex,
+--		GETDATE(),
+--		'DEL'
+--	from 
+--		deleted d
+--end
+--测试插入触发器
+--insert into Student(Sname,Sage,Ssex)
+--values('传低','1992-05-02 00:00:00.000','女');
+--测试删除触发器
+--delete from Student
+--where Student.Sname='次';
+--禁用单个触发器
+--disable trigger Student_audits_tri
+--on Student
+--禁用表上的所有触发器
+--disable trigger all on Student_audits_tri
+--禁用当前数据库上的所有触发器
+--disable trigger all on dbo.ChatRepo
+--启用表上单个触发器
+--enable trigger Student_audits_tri
+--on Student;
+--启用表上所有触发器
+--enable trigger all on Student
+--启用当前数据库的所有触发器
+--enable trigger all on dbo.ChatRepo
+--删除触发器
+--drop trigger if exists Student_audits_tri
